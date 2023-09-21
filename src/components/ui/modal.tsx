@@ -11,11 +11,13 @@ const Modal = ({ show, children }: ModalProp) => {
     return <></>;
   }
   return (
-    <div>
-    <Backdrop show={show}>
-      <div role="dialog">{children}</div>
-    </Backdrop>
-    <div className="absolute bg-white top-0 w-4/12 z-10"></div>
+    <div className="flex justify-center items-center">
+      <Backdrop show={show}>
+        <div></div>
+      </Backdrop>
+      <div role="dialog" className="absolute  bg-white top-10 w-6/12 p-5 z-10">
+        {children}
+      </div>
     </div>
   );
 };
