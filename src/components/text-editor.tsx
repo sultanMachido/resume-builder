@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Editor, EditorState, RichUtils } from "draft-js";
+import { ContentState, Editor, EditorState, RichUtils } from "draft-js";
 import "draft-js/dist/Draft.css";
 import { Button } from "./ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,16 +10,37 @@ import {
   faPlus,
   faUnderline,
 } from "@fortawesome/free-solid-svg-icons";
+import { stateToHTML } from "draft-js-export-html";
 
 type TextEditorProps = {
   addNewSection: () => void;
+  addToDocument: (content: string, resumeSectionIndex: number) => void;
+  documentSectionId: number;
+  saveContent: (resumeSectionIndex: number) => void;
+  clearInput: (resumeSectionIndex: number) => void;
 };
-const TextEditor = ({ addNewSection }: TextEditorProps) => {
+const TextEditor = ({
+  addNewSection,
+  addToDocument,
+  documentSectionId,
+  saveContent,
+  clearInput
+}: TextEditorProps) => {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty(),
   );
 
   const handleChange = (editorState) => {
+    const contentState = editorState.getCurrentContent();
+
+    const html = stateToHTML(contentState);
+    addToDocument(html, documentSectionId);
+    setEditorState(editorState);
+  };
+
+  const clearTextEditorContent = () => {
+    const emptyContentState = ContentState.createFromText("");
+    const editorState = EditorState.createWithContent(emptyContentState);
     setEditorState(editorState);
   };
 
@@ -71,7 +92,15 @@ const TextEditor = ({ addNewSection }: TextEditorProps) => {
           <FontAwesomeIcon icon={faPlus} />
           <p className="pl-2">Add New Section</p>
         </Button>
-        <Button>Add Spacer</Button>
+        <Button
+          onClick={() => {
+            saveContent(documentSectionId);
+            clearTextEditorContent();
+            clearInput(documentSectionId)
+          }}
+        >
+          Save
+        </Button>
       </div>
     </div>
   );

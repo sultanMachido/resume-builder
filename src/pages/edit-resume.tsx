@@ -33,7 +33,7 @@ export const SectionList = ({ sections, addNewSection }: SectionListProps) => {
 const EditResume = () => {
   const Template = Templates["DefaultTemplate"];
   return (
-    <section className="w-6/12">
+    <section className="w-full">
       <Template />
     </section>
   );
