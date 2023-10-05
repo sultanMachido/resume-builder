@@ -24,7 +24,7 @@ const TextEditor = ({
   addToDocument,
   documentSectionId,
   saveContent,
-  clearInput
+  clearInput,
 }: TextEditorProps) => {
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty(),
@@ -96,7 +96,7 @@ const TextEditor = ({
           onClick={() => {
             saveContent(documentSectionId);
             clearTextEditorContent();
-            clearInput(documentSectionId)
+            clearInput(documentSectionId);
           }}
         >
           Save

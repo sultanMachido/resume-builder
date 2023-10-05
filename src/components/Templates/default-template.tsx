@@ -2,7 +2,21 @@
 import { useEffect, useState } from "react";
 import TextEditor from "../text-editor";
 import { ResumeSectionList } from ".";
-import { resumeObject, resumeObjectBuilder } from "@/lib/utils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencil } from "@fortawesome/free-solid-svg-icons";
+import { useTemplateLogic } from "@/hooks/use-template-logic";
+
+type SectionEditorHeaderProps = {
+  resumeSectionTitle: string;
+  resumeSectionIndex: number;
+  editSectionTitle: (event: any, resumeSectionIndex: number) => void;
+};
+
+type TimeRangeProps = {
+  handleDateAddition: (currentSectionIndex:number, value:string, type:string) => void;
+  currentSectionIndex: number;
+  clear: boolean;
+};
 
 const defaultResumeSections = [
   {
@@ -40,20 +54,65 @@ const defaultResumeSections = [
   },
 ];
 
-const TimeRange = ({ handleDateAddition, currentSectionIndex, clear }) => {
+let debounceTimer: number;
+const SectionEditorHeader = ({
+  resumeSectionTitle,
+  resumeSectionIndex,
+  editSectionTitle,
+}: SectionEditorHeaderProps) => {
+  const [showEditIcon, setShowEditIcon] = useState(false);
+  return (
+    <div className="relative">
+      <div
+        className="flex justify-center"
+        onMouseEnter={() => {
+          setShowEditIcon(true);
+        }}
+        onMouseLeave={() => {
+          setShowEditIcon(false);
+        }}
+      >
+        <h2
+          className="text-center font-bold text-lg"
+          contentEditable={true}
+          onInput={(event) => {
+            clearTimeout(debounceTimer);
+
+            debounceTimer = setTimeout(() => {
+              editSectionTitle(event, resumeSectionIndex);
+            }, 3000) as unknown as number;
+          }}
+        >
+          {resumeSectionTitle}
+        </h2>
+        {showEditIcon && (
+          <sup>
+            <FontAwesomeIcon icon={faPencil} />
+          </sup>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const TimeRange = ({
+  handleDateAddition,
+  currentSectionIndex,
+  clear,
+}: TimeRangeProps) => {
   const [date, setDate] = useState({
     from: "",
     to: "",
   });
 
-  useEffect(()=>{
-     if (clear) {
+  useEffect(() => {
+    if (clear) {
       setDate({
         from: "",
         to: "",
-      })
-     }
-  },[clear])
+      });
+    }
+  }, [clear]);
 
   const addDate = (
     event: { target: { value: any } },
@@ -100,87 +159,32 @@ const TimeRange = ({ handleDateAddition, currentSectionIndex, clear }) => {
 };
 
 const DefaultTemplate = () => {
-  const [resumeSections, setResumeSections] = useState([
-    ...defaultResumeSections,
-  ]);
-  const [clearDate, setClearDate] = useState(false);
-
-  const addContentToSection = (content: string, resumeSectionIndex: number) => {
-    setClearDate(false)
-    const newContent = resumeObject
-      .getCopyOfResumeObject(resumeSections)
-      .addNewContentToResumeSection(content, resumeSectionIndex);
-
-    setResumeSections(newContent);
-  };
-
-  const saveContent = (resumeSectionIndex: number) => {
-    setClearDate(false)
-    const savedContent = resumeObject
-      .getCopyOfResumeObject(resumeSections)
-      .saveContentToResumeSection(resumeSectionIndex);
-
-    setResumeSections(savedContent);
-  };
-
-  const addNewSection = (currentSectionIndex: number) => {
-    const copyOfResumeSections = [...resumeSections];
-    const topHalfSection = copyOfResumeSections.splice(
-      0,
-      currentSectionIndex + 1,
-    );
-    const bottomHalfSection = [...copyOfResumeSections];
-
-    if (!bottomHalfSection.length) {
-      bottomHalfSection.push("New Section");
-    } else {
-      topHalfSection.push("New Section");
-    }
-
-    const mergedSections = [...topHalfSection, ...bottomHalfSection];
-
-    setResumeSections([...mergedSections]);
-  };
-  const handleDateAddition = (
-    resumeSectionIndex: number,
-    date: string,
-    type: string,
-  ) => {
-    const copyOfResumeSection = [...resumeSections];
-    copyOfResumeSection[resumeSectionIndex] = {
-      ...copyOfResumeSection[resumeSectionIndex],
-      timeRange: {
-        ...copyOfResumeSection[resumeSectionIndex]?.timeRange,
-        [type]: date,
-      },
-    };
-    setResumeSections(copyOfResumeSection);
-  };
-
-  const clearResumeSectionNewContent = (resumeSectionIndex: number) => {
-    const copyOfResumeSection = [...resumeSections];
-    copyOfResumeSection[resumeSectionIndex] = {
-      ...copyOfResumeSection[resumeSectionIndex],
-      resumeSectionNewContent: "",
-    };
-    setClearDate(true);
-    setResumeSections(copyOfResumeSection);
-  };
+  const {
+    addContentToSection,
+    addNewSection,
+    handleDateAddition,
+    handleSectionTitleEdit,
+    clearResumeSectionNewContent,
+    saveContent,
+    clearDate,
+    resumeSections,
+  } = useTemplateLogic(defaultResumeSections);
+  
   return (
     <section className="flex w-full justify-around">
       <div className="w-[33%]">
-        {resumeSections.length
+        {resumeSections?.length
           ? resumeSections.map(
               (
                 section: { [key: string]: any },
                 currentSectionIndex: number,
               ) => (
                 <div className="rounded-md p-5 bg-red w-full shadow-lg mx-auto mt-2">
-                  <div>
-                    <h2 className="text-center font-bold text-lg">
-                      {section?.resumeSectionTitle}
-                    </h2>
-                  </div>
+                  <SectionEditorHeader
+                    resumeSectionTitle={section?.resumeSectionTitle}
+                    editSectionTitle={handleSectionTitleEdit}
+                    resumeSectionIndex={currentSectionIndex}
+                  />
                   {section?.timeRange ? (
                     <TimeRange
                       handleDateAddition={handleDateAddition}

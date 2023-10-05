@@ -8,9 +8,11 @@
 
 ul{
   list-style-type: disc;
+  padding-left: 40px;
 }
 ol{
   list-style-type: decimal;
+  padding-left: 40px;
 }
 @layer base {
   :root {

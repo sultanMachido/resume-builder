@@ -1,14 +1,24 @@
+import { formatDate } from "@/lib/utils";
 import DefaultTemplate from "./default-template";
+import { DefaultSectionObject, ResumeSectionObject } from "@/types";
 
-export const ResumeSection = ({ resume }) => {
+type ResumeSectionListProps = {
+  resumeSections: ResumeSectionObject;
+};
+
+type ResumeSectionProps = {
+  resume: DefaultSectionObject;
+};
+
+export const ResumeSection = ({ resume }: ResumeSectionProps) => {
   const { resumeSectionSavedContent, resumeSectionNewContent, timeRange } =
     resume;
-  console.log(resumeSectionSavedContent, "saved");
+
   return (
     <section className="w-full">
       <h3 className="font-bold text-lg">{resume?.resumeSectionTitle}</h3>
       <div className="w-full">
-        {resumeSectionSavedContent.length
+        {resumeSectionSavedContent?.length
           ? resumeSectionSavedContent.map((content) => (
               <div className="flex justify-between">
                 <div
@@ -17,9 +27,12 @@ export const ResumeSection = ({ resume }) => {
                   }}
                 ></div>
                 {(content?.timeRange?.from || content?.timeRange?.to) && (
-                  <div>
-                    <p>
-                      {content?.timeRange?.from}-{content?.timeRange?.to}
+                  <div className="flex">
+                    <p className="font-bold">
+                      {formatDate(content?.timeRange?.from || "")} -{" "}
+                    </p>{" "}
+                    <p className="font-bold">
+                      {" " + formatDate(content?.timeRange?.to || "")}
                     </p>
                   </div>
                 )}
@@ -27,26 +40,27 @@ export const ResumeSection = ({ resume }) => {
             ))
           : null}
       </div>
-      <div className="w-full flex justify-between">
-        <div
-          dangerouslySetInnerHTML={{
-            __html: resumeSectionNewContent,
-          }}
-          className="w-9/12"
-        ></div>
-        {(timeRange?.from || timeRange?.to) && (
-          <div>
-            <p>
-              {timeRange?.from}-{timeRange?.to}
-            </p>
-          </div>
-        )}
-      </div>
+      {resumeSectionNewContent ? (
+        <div className="w-full flex justify-between">
+          <div
+            dangerouslySetInnerHTML={{
+              __html: resumeSectionNewContent,
+            }}
+            className="w-9/12"
+          ></div>
+          {(timeRange?.from || timeRange?.to) && (
+            <div className="flex">
+              <p className="font-bold">{timeRange?.from} - </p>
+              <p className="font-bold">{timeRange?.to}</p>
+            </div>
+          )}
+        </div>
+      ) : null}
     </section>
   );
 };
 
-export const ResumeSectionList = ({ resumeSections }) => {
+export const ResumeSectionList = ({ resumeSections }: ResumeSectionListProps) => {
   return (
     <>
       {resumeSections.map((resume) => (
