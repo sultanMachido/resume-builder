@@ -30,7 +30,7 @@ const TextEditor = ({
     EditorState.createEmpty(),
   );
 
-  const handleChange = (editorState) => {
+  const handleChange = (editorState:EditorState) => {
     const contentState = editorState.getCurrentContent();
 
     const html = stateToHTML(contentState);
