@@ -1,6 +1,9 @@
 import { formatDate } from "@/lib/utils";
 import DefaultTemplate from "./default-template";
 import { DefaultSectionObject, ResumeSectionObject } from "@/types";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencil } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
 type ResumeSectionListProps = {
   resumeSections: ResumeSectionObject;
@@ -13,6 +16,9 @@ type ResumeSectionProps = {
 export const ResumeSection = ({ resume }: ResumeSectionProps) => {
   const { resumeSectionSavedContent, resumeSectionNewContent, timeRange } =
     resume;
+  const [showEditIcon, setShowEditIcon] = useState(false);
+  const [showFromDateEditIcon, setShowFromDateEditIcon] = useState(false);
+  const [showToDateEditIcon, setShowToDateEditIcon] = useState(false);
 
   return (
     <section className="w-full">
@@ -21,18 +27,60 @@ export const ResumeSection = ({ resume }: ResumeSectionProps) => {
         {resumeSectionSavedContent?.length
           ? resumeSectionSavedContent.map((content) => (
               <div className="flex justify-between">
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: content.textContent,
-                  }}
-                ></div>
+                <div className="flex">
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: content.textContent,
+                    }}
+                    onMouseEnter={() => {
+                      setShowEditIcon(true);
+                    }}
+                    onMouseLeave={() => {
+                      setShowEditIcon(false);
+                    }}
+                    contentEditable={true}
+                  ></div>
+                  {showEditIcon && (
+                    <sup>
+                      <FontAwesomeIcon icon={faPencil} />
+                    </sup>
+                  )}
+                </div>
                 {(content?.timeRange?.from || content?.timeRange?.to) && (
                   <div className="flex">
-                    <p className="font-bold">
+                    <p
+                      className="font-bold"
+                      onMouseEnter={() => {
+                        setShowFromDateEditIcon(true);
+                      }}
+                      onMouseLeave={() => {
+                        setShowFromDateEditIcon(false);
+                      }}
+                      contentEditable={true}
+                    >
                       {formatDate(content?.timeRange?.from || "")} -{" "}
+                      {showFromDateEditIcon && (
+                        <sup>
+                          <FontAwesomeIcon icon={faPencil} />
+                        </sup>
+                      )}
                     </p>{" "}
-                    <p className="font-bold">
+                    <p
+                      className="font-bold"
+                      onMouseEnter={() => {
+                        setShowToDateEditIcon(true);
+                      }}
+                      onMouseLeave={() => {
+                        setShowToDateEditIcon(false);
+                      }}
+                      contentEditable={true}
+                    >
                       {" " + formatDate(content?.timeRange?.to || "")}
+                      {showToDateEditIcon && (
+                        <sup>
+                          <FontAwesomeIcon icon={faPencil} />
+                        </sup>
+                      )}
                     </p>
                   </div>
                 )}
@@ -60,7 +108,9 @@ export const ResumeSection = ({ resume }: ResumeSectionProps) => {
   );
 };
 
-export const ResumeSectionList = ({ resumeSections }: ResumeSectionListProps) => {
+export const ResumeSectionList = ({
+  resumeSections,
+}: ResumeSectionListProps) => {
   return (
     <>
       {resumeSections.map((resume) => (

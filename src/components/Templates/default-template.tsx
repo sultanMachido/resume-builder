@@ -4,6 +4,33 @@ import { ResumeSectionList } from ".";
 import { useTemplateLogic } from "@/hooks/use-template-logic";
 import TimeRange from "./time-range";
 import SectionEditorHeader from "./section-editor-header";
+import { useState } from "react";
+import UserBio, { UserBioEditor } from "./user-bio";
+import { jsPDF } from "jspdf";
+import { Button } from "../ui/button";
+
+
+type UserBioData = {
+  name?: string;
+  email?: string;
+  phoneNumber?: string;
+  address?: string;
+  country?: string;
+};
+
+const userData:UserBioData = {
+  name: "",
+  email: "",
+  phoneNumber: "",
+  address: "",
+  country: "",
+};
+
+type ResumePreviewProps = {
+  children: React.ReactNode
+}
+
+
 
 const defaultResumeSections = [
   {
@@ -41,7 +68,14 @@ const defaultResumeSections = [
   },
 ];
 
+const ResumePreview = ({ children }:ResumePreviewProps) => {
+  return <>{children}</>;
+};
+
+
 const DefaultTemplate = () => {
+  const [userBioData, setUserBioData] = useState(userData);
+
   const {
     addContentToSection,
     addNewSection,
@@ -53,9 +87,29 @@ const DefaultTemplate = () => {
     resumeSections,
   } = useTemplateLogic(defaultResumeSections);
 
+  const handleBioDataChange = (data:UserBioData) => {
+    setUserBioData(data);
+  };
+
+  const generatePdf = () => {
+    const pdf = new jsPDF("p", "pt", "letter");
+    const data = document.querySelector("#resumePreview");
+    pdf.addFont("roboto", "pdf", "normal", "bold");
+    const formattedData = data as HTMLElement;
+    pdf
+      .html(formattedData, {
+        margin: [10, 10, 10, 10],
+        autoPaging: "text",
+      })
+      .then(() => {
+        pdf.save("resume.pdf");
+      });
+  };
+
   return (
     <section className="flex w-full justify-around">
-      <div className="w-[33%]">
+      <div className="w-[33%] h-[90vh] overflow-y-scroll">
+        <UserBioEditor addUserBioData={handleBioDataChange} />
         {resumeSections?.length
           ? resumeSections.map(
               (
@@ -90,7 +144,15 @@ const DefaultTemplate = () => {
           : null}
       </div>
       <div className="w-[60%]">
-        <ResumeSectionList resumeSections={resumeSections} />
+        <div id="resumePreview">
+          <ResumePreview>
+            <UserBio userBioData={userBioData} />
+            <ResumeSectionList resumeSections={resumeSections} />
+          </ResumePreview>
+        </div>
+        <div>
+          <Button onClick={generatePdf}>Generate PDF</Button>
+        </div>
       </div>
     </section>
   );

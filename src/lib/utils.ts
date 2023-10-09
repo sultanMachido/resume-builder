@@ -1,4 +1,8 @@
-import { ContentToSave, DefaultSectionObject, ResumeSectionObject } from "@/types";
+import {
+  ContentToSave,
+  DefaultSectionObject,
+  ResumeSectionObject,
+} from "@/types";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { v1 as uuidv1 } from "uuid";
@@ -28,6 +32,7 @@ export const resumeObjectBuilder = () => {
       content: string,
       resumeSectionIndex: number,
     ) {
+      console.log(content, "content");
       const { copyOfResume } = this;
       copyOfResume[resumeSectionIndex] = {
         ...copyOfResume[resumeSectionIndex],
@@ -43,14 +48,17 @@ export const resumeObjectBuilder = () => {
 
       const time = copyOfResume[resumeSectionIndex]?.timeRange;
 
-      let contentToSave:ContentToSave = {
+      let contentToSave: ContentToSave = {
         textContent: textContent,
       };
 
       if (time) {
         contentToSave = {
           ...contentToSave,
-          timeRange: time,
+          timeRange: {
+            ...time,
+            to: time?.to || "Present",
+          },
         };
       }
 
