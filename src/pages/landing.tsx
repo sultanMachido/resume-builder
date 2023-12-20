@@ -3,7 +3,13 @@ import jumbotronImage from "../assets/jumbotron-image.png";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
+
+
 const LandingPage = () => {
+
+ 
+ 
+
   return (
     <section>
       <Navbar />

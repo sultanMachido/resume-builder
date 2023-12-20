@@ -4,9 +4,8 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { AnimatePresence, motion } from "framer-motion";
-import { Auth } from "@supabase/auth-ui-react";
-import { supabase } from "@/supabase/init";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
+import googleIcon from "../assets/googleIcon.png";
+import { authenticateWithGoogle } from "@/supabase/init";
 
 const NavItems = () => {
   return (
@@ -87,17 +86,15 @@ const Navbar = () => {
       </div>
       <MobileNavBar />
       <Modal show={showAuthModal}>
-        <Auth
-          supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
-          onlyThirdPartyProviders
-          providers={["google"]}
-        />
+        <div className="flex justify-center">
+          <Button onClick={authenticateWithGoogle}>
+            <img src={googleIcon} className="w-[40px] h-[30px]" />
+            <p>Sign in with Google</p>
+          </Button>
+        </div>
       </Modal>
     </nav>
   );
 };
 
 export default Navbar;
-
-
