@@ -9,7 +9,7 @@ import { authenticateWithGoogle } from "@/supabase/init";
 
 const NavItems = () => {
   return (
-    <ul className="block lg:flex justify-center font-bold text-white">
+    <ul className="block list-none cursor-pointer lg:flex justify-center font-bold text-white">
       <li className="p-[15px] px-0 lg:px-5 lg:p-0">Home</li>
       <li className="p-[15px] px-0 lg:px-5 lg:p-0">About</li>
       <li className="p-[15px] px-0 lg:px-5 lg:p-0">Product</li>

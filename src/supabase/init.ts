@@ -11,13 +11,14 @@ export const authenticateWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
     });
+    console.log(error,"error")
 
     if (error) {
       console.error("Authentication error:", error.message);
       return null;
     }
   } catch (error: unknown) {
-    console.error("Unexpected error during authentication:", error?.message);
+    // console.error("Unexpected error during authentication:", error?.message);
     return null;
   }
 };
