@@ -10,6 +10,9 @@ export const authenticateWithGoogle = async () => {
     // Open a new window for Google OAuth
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options:{
+        redirectTo: "https://resume-writer.netlify.app/edit-resume"
+      }
     });
     console.log(error,"error")
 
